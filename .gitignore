@@ -1,0 +1,25 @@
+# IDE/Editor files
+.idea
+.bsp
+
+# scala build folders and files
+target
+*.tgz
+*.jar
+
+# logs
+*.log
+
+# local settings
+localsettings.json
+local.conf
+waves_logback.xml
+
+# Text files
+*.txt
+*.ods
+*.csv
+*.dat
+
+# standalone docker
+Dockerfile
