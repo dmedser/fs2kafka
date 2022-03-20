@@ -5,5 +5,5 @@ final case class BootstrapServersConfig(host: String, port: Int) {
 }
 
 object BootstrapServersConfig {
-  val Default: BootstrapServersConfig = BootstrapServersConfig(defaults.host, defaults.port)
+  val Default: BootstrapServersConfig = BootstrapServersConfig(host, port)
 }
