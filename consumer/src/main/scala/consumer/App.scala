@@ -33,8 +33,14 @@ object App extends IOApp.Simple {
       .use { consumer =>
         Stream(
           // consumer.partitionedStream.parJoinUnbounded,
-          consumer.partitionsMapStream.flatMap(streamMap => Stream(streamMap.values.toSeq: _*)).parJoinUnbounded,
-          consumer.assignmentStream.evalMap(_.groupBy(_.topic()).keys.toList.traverse(consumer.partitionsFor))
+          consumer.partitionsMapStream.flatMap { streamMap =>
+            Stream(streamMap.values.toSeq: _*)
+          }.parJoinUnbounded,
+          consumer.assignmentStream
+            .evalMap {
+              _.groupBy(_.topic()).keys.toList
+                .traverse(consumer.partitionsFor)
+            }
         ).parJoinUnbounded.compile.drain
       }
   }

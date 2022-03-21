@@ -36,9 +36,15 @@ object App extends IOApp.Simple {
         value <- readLine("Value: ")
         topic <- readLine("Topic: ").map(input => if (input.isEmpty) topicA else "topic-" + input.toUpperCase)
         // passthrough <- readLine("Passthrough: ") // TODO what's the purpose?
-        partition <- readLine("Partition: ").map(_.toIntOption.getOrElse(0))
-        _         <- console.print("\n")
-      } yield ProducerRecords.one(ProducerRecord(topic, key, value).withPartition(partition) /*, passthrough*/ )
+        partition_? <- readLine("Partition: ").map(_.toIntOption)
+        _           <- console.print("\n")
+      } yield ProducerRecords.one(
+        record = {
+          val record = ProducerRecord(topic, key, value)
+          partition_?.fold(ifEmpty = record)(record.withPartition)
+        }
+        // passthrough = passthrough
+      )
     }
 
     Producer.makeResource[F, K, V](config).use(loop)
