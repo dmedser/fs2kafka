@@ -25,6 +25,6 @@ object Producer {
 
   private final class Impl[F[_] : FlatMap, K, V](producer: KafkaProducer[F, K, V]) extends Producer[F, K, V] {
     def produce[P](records: ProducerRecords[P, K, V]): F[ProducerResult[P, K, V]] =
-      producer.produce(records).flatten
+      producer.produce(records).flatten // TODO use KafkaProducer.pipe(ProducerSettings)
   }
 }

@@ -1,5 +1,7 @@
 import com.scalapenos.sbt.prompt.PromptTheme
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 lazy val commonSettings =
   Seq(
     scalaVersion := "2.13.8",
