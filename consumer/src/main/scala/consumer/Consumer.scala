@@ -11,6 +11,7 @@ import cats.syntax.option._
 import cats.syntax.show._
 import fs2.Stream
 import fs2.kafka._
+import org.apache.kafka.clients.consumer.OffsetAndMetadata
 import org.apache.kafka.common.{PartitionInfo, TopicPartition}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
@@ -31,6 +32,7 @@ trait Assignment[F[_]] {
 trait Offsets[F[_]] {
   def seek(partition: TopicPartition, offset: Long): F[Unit]
   def position(partition: TopicPartition): F[Long]
+  def committed(partitions: Set[TopicPartition]): F[Map[TopicPartition, OffsetAndMetadata]]
 }
 
 trait Topics[F[_]] {
@@ -74,7 +76,7 @@ object Consumer {
           s"key = '${committable.record.key.show}', " +
           s"value = '${committable.record.value.show}', " +
           s"offset = ${committable.offset.offsetAndMetadata.offset()}"
-      } *> committable.offset.commit
+      } *> committable.offset.commit // TODO use commitOffsetBatch
 
     def partitionedStream: Stream[F, Stream[F, CommittableConsumerRecord[F, K, V]]] =
       Stream.eval(log.info("Partitioned stream started")) *>
@@ -103,6 +105,16 @@ object Consumer {
     def position(partition: TopicPartition): F[Long] =
       consumer.position(partition).flatTap { position =>
         log.info(s"Current fetch offset of the $partition is $position")
+      }
+
+    def committed(partitions: Set[TopicPartition]): F[Map[TopicPartition, OffsetAndMetadata]] =
+      consumer.committed(partitions).flatTap { committed =>
+        log.info {
+          "Committed offsets for partitions:\n" +
+            committed
+              .map { case (partition, offset) => s"partition: $partition, offset: ${offset.offset()}" }
+              .mkString("\n")
+        }
       }
 
     def partitionsFor(topic: String): F[List[PartitionInfo]] =

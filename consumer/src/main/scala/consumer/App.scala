@@ -42,6 +42,7 @@ object App extends IOApp.Simple {
           _ <- cmd match {
             case s"pos $t $p"     => consumer.position(makePartition(t, p))
             case s"seek $t $p $o" => consumer.seek(makePartition(t, p), o.toLong)
+            case s"commit $t $p"  => consumer.committed(Set(makePartition(t, p)))
             case _                => Applicative[F].unit
           }
         } yield ()

@@ -10,7 +10,7 @@ lazy val commonSettings =
       object Version {
         val cats          = "2.7.0"
         val catsEffect    = "3.3.7"
-        val fs2kafka      = "2.4.0"
+        val fs2kafka      = "2.5.0-M3"
         val logback       = "1.2.11"
         val log4cats      = "2.2.0"
         val bm4           = "0.3.1"
