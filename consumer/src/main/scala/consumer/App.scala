@@ -64,11 +64,13 @@ object App extends IOApp.Simple {
             .evalMap { partitions =>
               val partitionsGroupedByTopic = partitions.groupBy(_.topic()).toList
 
-              for {
-                _ <- partitionsGroupedByTopic.traverse { case (topic, _) => consumer.partitionsFor(topic) }
-                _ <- partitionsGroupedByTopic.traverse { case (_, partitions) => consumer.beginningOffsets(partitions) }
-                _ <- partitionsGroupedByTopic.traverse { case (_, partitions) => consumer.endOffsets(partitions) }
-              } yield ()
+              partitionsGroupedByTopic.traverse { case (topic, partitions) =>
+                for {
+                  _ <- consumer.partitionsFor(topic)
+                  _ <- consumer.beginningOffsets(partitions)
+                  _ <- consumer.endOffsets(partitions)
+                } yield ()
+              }
             }*/
         ).parJoinUnbounded.compile.drain
       }
