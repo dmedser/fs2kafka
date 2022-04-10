@@ -48,9 +48,7 @@ object App extends IOApp.Simple {
           }
         } yield ()
 
-      def loop: F[Unit] = nextCommand.foreverM
-
-      Stream.eval(loop)
+      Stream.eval(nextCommand).repeat
     }
 
     Consumer
