@@ -34,11 +34,12 @@ object App extends IOApp.Simple {
 
     def commandsStream(consumer: Consumer[F, K, V]): Stream[F, Unit] = {
 
+      def makePartition(topic: String, partition: String): TopicPartition =
+        new TopicPartition(s"topic-${topic.toUpperCase}", partition.toInt)
+
       def nextCommand: F[Unit] =
         for {
           cmd <- console.readLine
-          makePartition =
-            (topic: String, partition: String) => new TopicPartition(s"topic-${topic.toUpperCase}", partition.toInt)
           _ <- cmd match {
             case s"pos $t $p"     => consumer.position(makePartition(t, p))
             case s"seek $t $p $o" => consumer.seek(makePartition(t, p), o.toLong)
