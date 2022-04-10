@@ -9,9 +9,9 @@ import scala.concurrent.duration._
 
 object App extends IOApp.Simple {
 
-  type K = String
-  type V = String
-  type P = Unit
+  private type K = String
+  private type V = String
+  private type P = Unit
 
   private val config: Config = Config(BootstrapServersConfig.Default)
 
@@ -45,7 +45,7 @@ object App extends IOApp.Simple {
   }
 
   def program0: IO[Unit] =
-    Producer0.makeResource[IO, K, V](config).use {
+    Producer.makeResource[IO, K, V](config).use {
       _.stream(nextRecord).compile.drain
     }
 
